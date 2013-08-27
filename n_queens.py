@@ -14,6 +14,9 @@
         from https://store.continuum.io/
         If you don't want to use Numba then remove the @autojit. 
         If you don't want to even use Numpy then make board a list of lists.
+        This program only works for N with value up to about 900 (on Windows 64 bit) due to 
+        stack size limitations in python. If you want to solve for large values of N then convert
+        add_queen() from a recursive to an iterative function.
 """
 from __future__ import division
 import numpy as np
@@ -101,15 +104,16 @@ def add_queen(N, queens, board):
     
     x = len(queens)
     for y in row_order:
-        # Don't check threatened positions. This is the constraint that makes this work.
+        # Don't check threatened positions. The efficiency of this program is basically due to the
+        # pruning of the search space that results from this.
         if board[x, y] != 0:
             continue
         
-        # Propagate the contraints that are added by the queen just added at (x, y)
+        # Add the contraints for the new queen at (x, y)
         propagate(N, board, x, y, 1)
         # Recurse
         valid_queens = add_queen(N, queens + [y], board)
-        # Undo the constraint added for queen at x, y
+        # Undo the constraints added for queen at x, y
         propagate(N, board, x, y, -1)
         
         # If we found a valid board deeper in the recursion just return it.
@@ -121,7 +125,7 @@ def add_queen(N, queens, board):
     
     
 def solve(N):
-    """Solve the N queens problem
+    """Solve the N queens problem with constraint propagation
         queens = solve(N) => queens[i] is the row of the queen in column i
                            where 0 <= row < N and 0 <= column < N
         Returns: List of rows for queens. 
@@ -133,12 +137,19 @@ if __name__ == '__main__':
     if len(sys.argv) != 2:
         print __doc__
         exit()
+        
     N = int(sys.argv[1])
     print 'Solving %d queens problem' % N
+    
     queens = solve(N)
+    
     print queens
-    if N <= 80:
-        print '-' * 80
-        for y in range(N):
-            print ''.join(' Q' if x == y else ' +' for x in queens) 
+    
+    if N > 80:
+        print 'Chessboard too big to display'
+        exit()
+        
+    print '-' * 80
+    for y in range(N):
+        print ''.join(' Q' if x == y else ' +' for x in queens) 
         
