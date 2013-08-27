@@ -89,10 +89,8 @@ def propagate(N, board, x, y, d):
 def add_queen(N, queens, board):
     """Add a queen to the column to right of the queens that have been placed on the board so far.
         Queens are added from left column to right. 
-        This function gets called recursively with a valid list of queens and attempts to add one 
+        This function gets called recursively with a feasible list of queens and attempts to add one 
         more queen immediately the right of those in the list.
-        It only gets called if queens are all in feasible positions (i.e. not threatened by each
-        other)
         
         N: Width of chessboard
         queens: List of queens that have been placed so far. queens[i] = row of queen on column i
