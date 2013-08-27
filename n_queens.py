@@ -10,13 +10,17 @@
         python .n_queens.py 20
         
     NOTES:
-        Uses NumPy and Numba so the best way to run this is to get the latest Anaconda disto
-        from https://store.continuum.io/
-        If you don't want to use Numba then remove the @autojit. 
-        If you don't want to even use Numpy then make board a list of lists.
-        This program only works for N with value up to about 900 (on Windows 64 bit) due to 
-        stack size limitations in python. If you want to solve for large values of N then convert
-        add_queen() from a recursive to an iterative function.
+        1 Uses NumPy and Numba so the best way to run this is to get the latest Anaconda disto
+          from https://store.continuum.io/
+        2 If you don't want to use Numba then remove the @autojit. 
+        3 If you don't want to even use Numpy then make board a list of lists.
+        4 This program only works for N with value up to about 900 (on Windows 64 bit) due to 
+          stack size limitations in python. If you want to solve for large values of N then convert
+          add_queen() from a recursive to an iterative function.
+        5 Alternative solutions include
+            Local search http://en.wikipedia.org/wiki/Min-conflicts_algorithm#Example
+            MIP: http://scip.zib.de/download/files/scip_intro_01.pdf 
+            A solver: e.g Comet: http://www.hakank.org/comet/queensn.co
 """
 from __future__ import division
 import numpy as np
@@ -38,7 +42,8 @@ def propagate(N, board, x, y, d):
         
         N: Width of chessboard
         board: State of chessboard for current queens which does not include the one at (x, y). 
-               board[x, y] = 1 if (x, y) is threatened by any of queens
+               board[a, b] = 1 if (a, b) is threatened by any of the queens
+               board will be updated to inclue the queen at (x, y) when this function returns
         x, y: Coordinates of queen to be added/removed
         d: +1 to add a queen, -1 to remove a queen
     """
