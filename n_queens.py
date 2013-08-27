@@ -10,14 +10,14 @@
         python .n_queens.py 20
         
     NOTES:
-        1 Uses NumPy and Numba so the best way to run this is to get the latest Anaconda disto
+        1 Uses NumPy and Numba so the best way to run this is to get the latest Anaconda distro
           from https://store.continuum.io/
         2 If you don't want to use Numba then remove the @autojit. 
-        3 If you don't want to even use Numpy then make board a list of lists.
-        4 This program only works for N with value up to about 900 (on Windows 64 bit) due to 
-          stack size limitations in python. If you want to solve for large values of N then convert
+        3 If you don't even want to use Numpy then make board a list of lists.
+        4 This program only works for N with values up to about 900 (on Windows 64 bit) due to 
+          stack size limitations in python. If you want to solve for largee values of N then convert
           add_queen() from a recursive to an iterative function.
-        5 Alternative solutions include
+        5 Alternative methods for solving N queens include
             Local search http://en.wikipedia.org/wiki/Min-conflicts_algorithm#Example
             MIP: http://scip.zib.de/download/files/scip_intro_01.pdf 
             A solver: e.g Comet: http://www.hakank.org/comet/queensn.co
@@ -42,8 +42,8 @@ def propagate(N, board, x, y, d):
         
         N: Width of chessboard
         board: State of chessboard for current queens which does not include the one at (x, y). 
-               board[a, b] = 1 if (a, b) is threatened by any of the queens
-               board will be updated to inclue the queen at (x, y) when this function returns
+               board[a, b] > 0 if (a, b) is threatened by any of the queens, == 0 otherwise
+               board will be updated to include the queen at (x, y) when this function returns
         x, y: Coordinates of queen to be added/removed
         d: +1 to add a queen, -1 to remove a queen
     """
@@ -87,10 +87,12 @@ def propagate(N, board, x, y, d):
 
 
 def add_queen(N, queens, board):
-    """Add a queen to board
-        Board is filled from left column to right.
-        This function called recursively. 
-        It gets called with a valid list of queens and attempts to add one more queen. 
+    """Add a queen to the column to right of the queens that have been placed on the board so far.
+        Queens are added from left column to right. 
+        This function gets called recursively with a valid list of queens and attempts to add one 
+        more queen immediately the right of those in the list.
+        It only gets called if queens are all in feasible positions (i.e. not threatened by each
+        other)
         
         N: Width of chessboard
         queens: List of queens that have been placed so far. queens[i] = row of queen on column i
@@ -99,18 +101,19 @@ def add_queen(N, queens, board):
         
         Note: board gets modified then restored to its state at entry to this function.
     """
-    # The queens are valid by design. If there are N of them so we must have a full solution.
+    # The queens are in feasible locations by design. If there are N of them so we must have a full 
+    #  solution so we return it.
     if len(queens) == N:
         return queens
 
-    # Checking rows in random order makes this run fast
+    # Checking rows in random order makes this run faster. Why?
     row_order = list(range(N))
     random.shuffle(row_order) 
     
     x = len(queens)
     for y in row_order:
         # Don't check threatened positions. The efficiency of this program is basically due to the
-        # pruning of the search space that results from this.
+        #  pruning of the search space that results from this.
         if board[x, y] != 0:
             continue
         
@@ -121,11 +124,11 @@ def add_queen(N, queens, board):
         # Undo the constraints added for queen at x, y
         propagate(N, board, x, y, -1)
         
-        # If we found a valid board deeper in the recursion just return it.
+        # If we found a feasible full board deeper in the recursion then return it.
         if valid_queens:
             return valid_queens
             
-    # If we got here then queens could be not be extended to a valid N queens list 
+    # If we got here then queens could be not be extended to a feasible N queens list 
     return None
     
     
